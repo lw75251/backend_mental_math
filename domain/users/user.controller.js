@@ -8,8 +8,18 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const TokenUtils = require('../tokens/token.utils');
 
-exports.test = function (req, res) {
-    res.send('Greetings from the Test controller!');
+exports.getUser = function (req, res) {
+    if(!req.body.uid) {
+        return res.status(400).send({
+            message: "No UID in Request Body"
+        })
+    }
+
+    // const uid = req.body.uid
+    // User.findById(uid)
+    return res.status(200).send({
+        message: "Authenticated. Retrieved User"
+    })
 }
 
 exports.createUser = async function (req, res) {
@@ -19,7 +29,7 @@ exports.createUser = async function (req, res) {
         });
     }
     try {
-        const hashedPassword = await bcrypt.hashSync(req.body.password, 10);
+        const hashedPassword = bcrypt.hashSync(req.body.password, 10);
         
         const user = new User({
             uid: new mongoose.Types.ObjectId(),
@@ -39,47 +49,4 @@ exports.createUser = async function (req, res) {
             message: "Server Error"
         });
     }
-}
-
-exports.loginUser = async function (req, res) {
-
-    if(!req.body.email || !req.body.password) {
-        return res.status(400).send({
-            message: "Insufficient parameters"
-        });
-    }
-
-    let hashedPassword;
-    await User.findOne({email: req.body.email}, 'password',
-      function(err, user) {
-        hashedPassword = user.password
-      });
-
-    if ( !bcrypt.compareSync(req.body.password, hashedPassword) ) {
-        res.status(401).json({
-            message: "Invalid Email/Password Combination"
-        })
-    } else {
-        const _db = getDb();
-        const authToken = TokenUtils.generateAccessToken(req.body)
-        const refreshToken = TokenUtils.generateRefreshToken(req.body)
-
-        _db.db("test").collection("AuthTokens").insertOne({
-            "authToken": authToken
-        })
-        _db.db("test").collection("RefreshTokens").insertOne({
-            "refreshToken": refreshToken
-        })
-
-        res.status(200).json({
-            message: "Successfully Logged In",
-            tokens: {
-                authToken: authToken,
-                refreshToken: refreshToken
-            }
-        })
-    }
-
-
-
 }

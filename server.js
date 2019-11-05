@@ -1,23 +1,61 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const TokenUtils = require('./domain/tokens/token.utils');
 
 // Routes
 const userRoutes = require('./domain/users/user.routes');
 
+// MongoDB
+const getDb = require('./config/db').getDb;
+const User = require('./domain/users/user.model');
 
 const app = express();
 
 app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-    res.json({
-        "message": "Hi"
-    })
-})
+app.post('/login', async (req, res) => {
+    if(!req.body.email || !req.body.password) {
+        return res.status(400).send({
+            message: "Insufficient parameters"
+        });
+    }
 
-app.use('/user', userRoutes);
+    let hashedPassword;
+    await User.findOne({email: req.body.email}, 'password',
+        function(err, user) {
+        hashedPassword = user.password
+        });
+
+    if ( await !bcrypt.compareSync(req.body.password, hashedPassword) ) {
+        res.status(401).json({
+            message: "Invalid Email/Password Combination"
+        })
+    } else {
+        const _db = getDb();
+        const authToken = TokenUtils.generateAccessToken(req.body)
+        // const refreshToken = TokenUtils.generateRefreshToken(req.body)
+
+        _db.db("test").collection("AuthTokens").insertOne({
+            "authToken": authToken
+        })
+        // _db.db("test").collection("RefreshTokens").insertOne({
+        //     "refreshToken": refreshToken
+        // })
+
+        res.status(200).json({
+            message: "Successfully Logged In",
+            tokens: {
+                authToken: authToken,
+                // refreshToken: refreshToken
+            }
+        })
+    }
+});
+
+app.use('/user', TokenUtils.authenticateToken, userRoutes);
 
 
 // app.post('/users', async (req, res) => {
