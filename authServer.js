@@ -2,7 +2,7 @@ import express, { json } from 'express'
 import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
 
-import client from 'config/db.js'
+import client from './db'
 
 const app = express()
 
@@ -28,11 +28,10 @@ app.post("/token", (req, res) => {
 })
 
 app.post("/login", (req, res) => {
-    // Authenticate User
+    // Authenticate User 
     client.connect(err => {
-        const collection = client.db("test").collection("devices");
-       // perform actions on the collection object
-        client.close();
+        const collection = client.db("test").collection("tokens");
+        
       });
 
     const username = req.body.username
@@ -64,7 +63,7 @@ function authenticateToken( req, res, next ) {
 }
 
 function generateAccessToken(user) {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15s'})
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h'})
 }
 
 app.listen(4000)
