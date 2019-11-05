@@ -11,10 +11,9 @@ module.exports = {
 };
 
 // MongoDB Client Connection
-function initDb(callback) {
+function initDb() {
     if (_db) {
         console.warn("Trying to init DB again!");
-        return callback(null, _db);
     }
 
     MongoClient.connect(mongoDB, {
@@ -25,11 +24,10 @@ function initDb(callback) {
 
     function connected(err, db) {
         if (err) {
-            return callback(err);
+            return console.log(err);
         }
-        console.log("DB initialized - connected to: " + config.db.connectionString.split("@")[1]);
+        console.log("DB initialized - connected to: " + mongoDB.split("@")[1]);
         _db = db;
-        return callback(null, _db);
     }
 }
 
@@ -45,6 +43,7 @@ try {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     });
+    initDb();
 } catch (err) {
     console.log(err);
 }

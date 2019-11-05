@@ -1,19 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-// const jwt = require('jsonwebtoken');
-// const bcrypt = require('bcrypt');
-// const mongoose = require('mongoose');
 
 // Routes
 const userRoutes = require('./domain/users/user.routes');
 
-// Util Methods
-// const TokenUtils = require('./domain/tokens/token.utils');
-
 
 const app = express();
-const router = express.Router();
 
 app.use(bodyParser.json());
 const PORT = process.env.PORT || 3000;
@@ -24,7 +17,7 @@ app.get('/', (req, res) => {
     })
 })
 
-app.use('/users', userRoutes);
+app.use('/user', userRoutes);
 
 
 // app.post('/users', async (req, res) => {

@@ -22,3 +22,5 @@ class TokenUtils {
     }
     
 }
+
+module.exports = TokenUtils;
