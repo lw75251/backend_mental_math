@@ -14,6 +14,7 @@ const statsController = require('./stats.controller');
 // router.get('/divide', statsController.getstats);
 
 router.post('/', statsController.createStat);
+router.post('/wrong/:userId', statsController.saveWrong);
 
 
 module.exports = router;
