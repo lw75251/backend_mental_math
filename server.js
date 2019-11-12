@@ -6,6 +6,7 @@ const TokenUtils = require('./domain/tokens/token.utils');
 
 // Routes
 const userRoutes = require('./domain/users/user.routes');
+const statRoutes = require('./domain/game/stats.routes');
 
 // MongoDB
 const getDb = require('./config/db').getDb;
@@ -55,7 +56,8 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.use('/user', TokenUtils.authenticateToken, userRoutes);
+app.use('/user', userRoutes);
+app.use('/stat', statRoutes);
 
 
 // app.post('/users', async (req, res) => {

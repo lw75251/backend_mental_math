@@ -15,8 +15,8 @@ exports.getUser = function (req, res) {
         })
     }
 
-    // const uid = req.body.uid
-    // User.findById(uid)
+    const uid = req.body.uid
+    User.findById(uid)
     return res.status(200).send({
         message: "Authenticated. Retrieved User"
     })
@@ -32,7 +32,6 @@ exports.createUser = async function (req, res) {
         const hashedPassword = bcrypt.hashSync(req.body.password, 10);
         
         const user = new User({
-            uid: new mongoose.Types.ObjectId(),
             email: req.body.email,
             name: req.body.name,
             password: hashedPassword,
