@@ -1,4 +1,4 @@
-const User = require('./user.model');
+const User = require('./user.model').User;
 
 // MongoDB
 const getDb = require('../../config/db').getDb;
@@ -30,22 +30,20 @@ exports.createUser = async function (req, res) {
     }
     try {
         const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-        
         const user = new User({
             email: req.body.email,
             name: req.body.name,
             password: hashedPassword,
-          });
-
-        user.save();
-        res.status(201).json({
-            message: "Successfully created User",
-            user: user
+            // history: [],
+            // review: []
         });
+        console.log(user)
+        user.save();
+        res.status(201).json(user);
     
-    } catch {
+    } catch (err) {
         res.status(500).json({
-            message: "Server Error"
+            message: err
         });
     }
 }
